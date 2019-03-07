@@ -1,18 +1,20 @@
+include: "test_boxever.model.lkml"
 explore: user_order_value_snapshot {}
 view: user_order_value_snapshot {
   derived_table: {
-    sql_trigger_value: SELECT CURRENT_DATE ;;
+    sql_trigger_value: SELECT 1 ;;
     create_process: {
-#       sql_step: DROP TABLE IF EXISTS profservices_scratch.oi_snapshot_date_{{'now' | date: "%s" | minus : 86400 | date: "%Y%m%d" }};;
+      sql_step: DROP TABLE IF EXISTS teach_scratch.oi_snapshot_date_{{'now' | date: "%s" | minus : 86400 | date: "%Y%m%d" }};;
       sql_step: CREATE TABLE teach_scratch.oi_snapshot_date_{{'now' | date: "%s" | minus : 86400 | date: "%Y%m%d" }} AS ${user_value_yesterday_data.SQL_TABLE_NAME} ;;
-      sql_step: CREATE TABLE ${SQL_TABLE_NAME} AS SELECT * FROM teach_scratch.oi_snapshot_date_{{'now' | date: "%s" | minus : 86400 | date: "%Y%m%d" }} ;;
-#       sql_step:  INSERT INTO teach_scratch.oi_snapshot_date ;;
+#       sql_step: CREATE TABLE ${SQL_TABLE_NAME} AS SELECT * FROM teach_scratch.oi_snapshot_date_{{'now' | date: "%s" | minus : 86400 | date: "%Y%m%d" }} ;;
+      sql_step:  INSERT INTO ${SQL_TABLE_NAME} SELECT * FROM teach_scratch.oi_snapshot_date_{{'now' | date: "%s" | minus : 86400 | date: "%Y%m%d" }};;
     }
 
   }
   dimension: snapshot_date {
     type: date
     sql: ${TABLE}.snapshot_date ;;
+    convert_tz: no
   }
 
   dimension: user_id {
@@ -134,6 +136,7 @@ view: user_value_yesterday_data {
   dimension: hvlv {}
   dimension: snapshot_date {
     type: date
+  convert_tz: no
   }
   dimension: user_id {
     type: number
@@ -207,6 +210,7 @@ view: user_order_value {
   dimension: snapshot_date {
     type: date
     sql: ${TABLE}.snapshot_date ;;
+    convert_tz: no
   }
 
   dimension: user_id {

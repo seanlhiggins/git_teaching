@@ -1,10 +1,48 @@
+# explore: order_items_extended {}
+view: order_items_extended {
+  extends: [order_items]
+
+  measure: total_revenue {
+    label: "Show me the Money"
+    sql: ${sale_price} * 2 ;;
+  }
+}
+
 view: order_items {
+
+  # sql_table_name:
+  # {% if created_date._is_selected %}
+  # public.order_items
+  # {% elsif created_month._is_selected %}
+  # public.order_items_monthly
+  # {% else %}
+  # public.order_items_yearly
+  # {% endif %};;
   sql_table_name: public.order_items ;;
 
   dimension: id {
     primary_key: yes
     type: number
     sql: ${TABLE}.id ;;
+  }
+
+  parameter:  report_granularity{
+    type: unquoted
+    allowed_value: {value:"Daily"}
+    allowed_value: {value:"Monthly"}
+    allowed_value: {value:"Yearly"}
+  }
+
+  dimension: dynamic_date_granularity {
+    type: string
+    sql: {% if report_granularity._parameter_value == "Daily" %}
+    ${created_date}::VARCHAR
+    {% elsif report_granularity._parameter_value == "Monthly" %}
+    ${created_month}
+    {% else %}
+    ${created_year}
+    {% endif %};;
+
   }
 
   dimension_group: created {
@@ -19,6 +57,13 @@ view: order_items {
       year
     ]
     sql: ${TABLE}.created_at ;;
+  }
+
+  dimension: days_since_order {
+    type: string
+#     sql_start: ${created_date} ;;
+#     sql_end: CURRENT_DATE ;;
+    sql: COALESCE(DATEDIFF('day',${created_date},CURRENT_DATE)::VARCHAR,'N/A') ;;
   }
 
   dimension_group: delivered {
@@ -96,14 +141,34 @@ view: order_items {
   }
 
   measure: total_revenue {
+    label: "{% if _user_attributes['country'] == 'USA' %} Money! {% else %} Revenue {% endif %}"
     type: sum
     sql: ${sale_price} ;;
     value_format_name: usd
+    html: {{rendered_value}}|| {{ order_items.avg_revenue._rendered_value }}</div>
+
+    ;;
   }
 
   measure: avg_revenue {
     type: average
     sql: ${sale_price} ;;
+  }
+
+  parameter: metric_selector {
+    type: unquoted
+    allowed_value: {value:"Average"}
+    allowed_value: {value:"Total"}
+  }
+
+  measure: dynamic_metric {
+    label_from_parameter: metric_selector
+    type: number
+    sql: {% if metric_selector._parameter_value == "Average" %}
+    AVG(${sale_price})
+    {% else %}
+    SUM(${sale_price})
+    {% endif %};;
   }
 
   measure: total_minus_average {
@@ -114,6 +179,11 @@ view: order_items {
   measure: order_value_per_order {
     type: number
     sql: 1.0 * ${total_revenue} / NULLIF(${count},0) ;;
+  }
+
+  measure: total_gross_margin {
+    type: sum
+    sql: ${sale_price} - ${inventory_items.cost} ;;
   }
 
   # ----- Sets of fields for drilling ------

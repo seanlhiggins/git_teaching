@@ -1,3 +1,4 @@
+explore: users_orders_facts {}
 view: users_orders_facts {
   derived_table: {
     sql: SELECT
@@ -6,13 +7,13 @@ view: users_orders_facts {
         COUNT(*) AS "order_items.count"
       FROM public.order_items  AS order_items
       LEFT JOIN public.users  AS users ON order_items.user_id = users.id
-
+      WHERE {% date_start date_filter %} > '2018-01-01'
       GROUP BY 1,DATE_TRUNC('month', order_items.created_at )
       ORDER BY 1
 
        ;;
   }
-
+  filter: date_filter {type:date}
   measure: count {
     type: count
     drill_fields: [detail*]

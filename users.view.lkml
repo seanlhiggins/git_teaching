@@ -2,18 +2,21 @@ view: users {
   sql_table_name: public.users ;;
 
   dimension: id {
+    hidden: yes
     primary_key: yes
     type: number
     sql: ${TABLE}.id ;;
   }
 
   dimension: age {
+    group_label: "Ages"
 #     label: "Campaign"
     type: number
     sql: ${TABLE}.age ;;
   }
 
   dimension: age_tier {
+    group_label: "Ages"
     type: tier
     tiers: [20,40,60,80]
     style: integer
@@ -21,6 +24,7 @@ view: users {
   }
 
   dimension: is_user_under_35 {
+    group_label: "Ages"
     type: yesno
     sql: ${age} < 35 ;;
   }
