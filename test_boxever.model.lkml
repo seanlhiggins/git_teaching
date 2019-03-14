@@ -62,6 +62,7 @@ access_grant: country {
 # }
 
 
+
 explore: order_items {
   label: "Orders, Users, Inventory Items"
   description: "Contains Ecommerce Data, use freely"
@@ -74,6 +75,7 @@ explore: order_items {
   }
 
   join: user_order_value {
+
     sql_on: ${user_order_value.user_id} = ${users.id};;
     type: left_outer
     relationship: one_to_one
