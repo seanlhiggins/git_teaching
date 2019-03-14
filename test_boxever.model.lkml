@@ -65,7 +65,7 @@ access_grant: country {
 
 explore: order_items {
   label: "Orders, Users, Inventory Items"
-  description: "Contains Ecommerce Data, use freely"
+  description: "Contains Ecommerce Data, use freely, here's even more info"
   fields: [ALL_FIELDS*,-order_items.total_gross_margin]
 
   join: users {
