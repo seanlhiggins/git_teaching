@@ -7,7 +7,7 @@ datagroup: etl_cycle {
   sql_trigger: SELECT MAX(id) FROM etl_log;;
   max_cache_age: "24 hours"
 }
-
+# test comment
 
 # access_grant:  {}
 explore: aggregation {
