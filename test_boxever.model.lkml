@@ -8,7 +8,7 @@ datagroup: etl_cycle {
   max_cache_age: "24 hours"
 }
 # test comment
-
+# another test comment
 # access_grant:  {}
 explore: aggregation {
   required_access_grants: []
